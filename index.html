@@ -3,48 +3,328 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Workmatic Sounds — songs as playable instruments</title>
+<title>Workmatic Sounds — songs as playable VST instruments</title>
+<meta name="description" content="Full songs rebuilt as playable VST instruments. Every note is the original audio; every FL Studio project is pure MIDI on the grid.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
-  :root { --bg:#0f1014; --card:#1a1c24; --edge:#2c3040; --tx:#f0f0f5; --mut:#7f87a0; --acc:#6ea8ff; }
-  * { box-sizing:border-box; margin:0; }
-  body { background:var(--bg); color:var(--tx); font:16px/1.6 system-ui,Segoe UI,Arial,sans-serif; }
-  main { max-width:960px; margin:0 auto; padding:48px 20px; }
-  h1 { font-size:34px; letter-spacing:.5px; }
-  .sub { color:var(--mut); margin:8px 0 40px; }
-  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
-  .card { background:var(--card); border:1px solid var(--edge); border-radius:12px; padding:22px; }
-  .card h2 { font-size:20px; }
-  .card .song { color:var(--acc); font-size:14px; margin:2px 0 12px; }
-  .card p { color:var(--mut); font-size:14px; margin-bottom:16px; }
-  .btn { display:inline-block; background:var(--acc); color:#0b0c10; font-weight:600;
-         padding:10px 18px; border-radius:8px; text-decoration:none; }
-  .btn.soon { background:var(--edge); color:var(--mut); pointer-events:none; }
-  footer { color:var(--mut); font-size:13px; margin-top:56px; border-top:1px solid var(--edge); padding-top:20px; }
+  :root {
+    --bg:#0a0b0f; --panel:#12141c; --panel2:#161926; --edge:#232738;
+    --tx:#eef0f6; --mut:#8a90a6; --acc:#6ea8ff; --acc2:#a06bff;
+    --grad:linear-gradient(135deg,#6ea8ff 0%,#a06bff 100%);
+    --mono:'JetBrains Mono',monospace;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { scroll-behavior:smooth; }
+  body { background:var(--bg); color:var(--tx); font:16px/1.65 'Inter',system-ui,sans-serif;
+         -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+  .wrap { max-width:1100px; margin:0 auto; padding:0 24px; }
+
+  /* nav */
+  nav { position:sticky; top:0; z-index:50; backdrop-filter:blur(14px);
+        background:rgba(10,11,15,.72); border-bottom:1px solid var(--edge); }
+  .nav-in { display:flex; align-items:center; gap:28px; height:64px; }
+  .logo { font-weight:800; letter-spacing:.14em; font-size:14px; }
+  .logo b { background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .nav-links { display:flex; gap:24px; font-size:14px; color:var(--mut); margin-left:auto; }
+  .nav-links a:hover { color:var(--tx); }
+  .nav-cta { background:var(--grad); color:#0a0b0f; font-weight:600; font-size:14px;
+             padding:9px 18px; border-radius:9px; }
+
+  /* hero */
+  .hero { position:relative; padding:96px 0 72px; }
+  .orb { position:absolute; border-radius:50%; filter:blur(120px); opacity:.22; pointer-events:none; }
+  .orb.a { width:520px; height:520px; background:#4d7fff; top:-160px; left:-120px; }
+  .orb.b { width:420px; height:420px; background:#8b4dff; top:40px; right:-100px; }
+  .hero-grid { position:relative; display:grid; grid-template-columns:1.15fr 1fr; gap:56px; align-items:center; }
+  .kicker { font:600 12px var(--mono); letter-spacing:.22em; color:var(--acc); text-transform:uppercase; }
+  h1 { font-size:clamp(36px,5.2vw,58px); font-weight:800; line-height:1.08; letter-spacing:-.02em; margin:18px 0; }
+  h1 span { background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .lede { color:var(--mut); font-size:18px; max-width:520px; }
+  .cta-row { display:flex; gap:14px; margin:30px 0 26px; flex-wrap:wrap; }
+  .btn { display:inline-flex; align-items:center; gap:10px; font-weight:600; font-size:15px;
+         padding:14px 26px; border-radius:12px; transition:transform .15s, box-shadow .15s; }
+  .btn.primary { background:var(--grad); color:#0a0b0f; box-shadow:0 8px 32px rgba(110,168,255,.28); }
+  .btn.primary:hover { transform:translateY(-2px); box-shadow:0 12px 40px rgba(110,168,255,.4); }
+  .btn.ghost { border:1px solid var(--edge); color:var(--tx); background:var(--panel); }
+  .btn.ghost:hover { border-color:var(--acc); }
+  .stats { display:flex; gap:26px; flex-wrap:wrap; }
+  .stat b { display:block; font:700 22px var(--mono); background:var(--grad);
+            -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .stat span { font-size:12.5px; color:var(--mut); }
+
+  /* plugin mockup */
+  .plug { background:#0f1014; border:1px solid #2c3040; border-radius:14px; overflow:hidden;
+          box-shadow:0 30px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(110,168,255,.06);
+          transform:rotate(1.2deg); }
+  .plug-bar { display:flex; align-items:center; gap:8px; background:#181a22; padding:9px 13px;
+              border-bottom:1px solid #232738; font:500 11px var(--mono); color:var(--mut); }
+  .dot { width:10px; height:10px; border-radius:50%; background:#2c3040; }
+  .plug-body { padding:30px 26px 22px; background:
+      radial-gradient(90% 70% at 50% 0%, rgba(110,168,255,.07), transparent), #14161e; text-align:center; }
+  .plug-name { font:800 26px 'Inter'; letter-spacing:.06em; }
+  .plug-sub { font:500 11.5px var(--mono); color:#7f87a0; margin-top:10px; }
+  .live { display:inline-block; margin:22px 0 8px; padding:12px 34px; border-radius:9px;
+          background:var(--grad); color:#0a0b0f; font:700 13px var(--mono); letter-spacing:.1em;
+          box-shadow:0 0 24px rgba(110,168,255,.35); }
+  .plug-foot { font:500 10px var(--mono); color:#565c70; letter-spacing:.18em; margin-top:14px; }
+  .keys { display:flex; height:56px; border-top:1px solid #232738; }
+  .keys div { flex:1; background:#e8e9ee; border-right:1px solid #b9bcc9; position:relative; }
+  .keys div.b::after { content:''; position:absolute; top:0; left:62%; width:76%; height:58%; background:#14161e; border-radius:0 0 3px 3px; }
+  .keys div.lit { background:linear-gradient(#cfe0ff,#9fc0ff); }
+
+  /* sections */
+  section { padding:76px 0; }
+  .sec-kicker { font:600 12px var(--mono); letter-spacing:.22em; color:var(--acc); text-transform:uppercase; }
+  h2 { font-size:clamp(26px,3.4vw,36px); font-weight:800; letter-spacing:-.01em; margin:12px 0 40px; }
+
+  /* player */
+  .player { display:flex; align-items:center; gap:20px; background:var(--panel); border:1px solid var(--edge);
+            border-radius:16px; padding:20px 24px; }
+  .pbtn { width:56px; height:56px; min-width:56px; border-radius:50%; border:0; cursor:pointer;
+          background:var(--grad); display:grid; place-items:center; box-shadow:0 6px 24px rgba(110,168,255,.3); }
+  .pbtn svg { width:20px; height:20px; fill:#0a0b0f; }
+  .wave { display:flex; align-items:center; gap:3px; height:56px; flex:1; cursor:pointer; }
+  .wave i { flex:1; background:#2c3140; border-radius:2px; min-height:8%; transition:background .2s; }
+  .wave i.on { background:var(--acc); }
+  .ptime { font:600 13px var(--mono); color:var(--mut); min-width:88px; text-align:right; }
+  .player-cap { font-size:13px; color:var(--mut); margin-top:12px; }
+
+  /* cards */
+  .grid3 { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; }
+  .card { background:var(--panel); border:1px solid var(--edge); border-radius:16px; padding:26px;
+          transition:transform .18s, border-color .18s; }
+  .card:hover { transform:translateY(-4px); border-color:#3a4160; }
+  .step-n { font:700 13px var(--mono); color:var(--acc); }
+  .card h3 { font-size:18px; margin:10px 0 8px; }
+  .card p { color:var(--mut); font-size:14.5px; }
+
+  /* pack */
+  .pack { display:grid; grid-template-columns:1.1fr .9fr; gap:36px; background:var(--panel);
+          border:1px solid var(--edge); border-radius:20px; padding:38px; align-items:center; }
+  .tag { display:inline-block; font:600 11px var(--mono); letter-spacing:.14em; color:var(--acc);
+         border:1px solid rgba(110,168,255,.35); border-radius:99px; padding:4px 12px; margin-bottom:16px; }
+  .pack h3 { font-size:30px; font-weight:800; }
+  .pack .song { color:var(--acc2); font-weight:600; margin:6px 0 16px; }
+  .pack p { color:var(--mut); font-size:15px; }
+  .spec { display:grid; grid-template-columns:1fr 1fr; gap:10px 22px; margin:22px 0 26px; }
+  .spec div { font-size:14px; color:var(--mut); border-left:2px solid var(--edge); padding-left:12px; }
+  .spec div b { display:block; color:var(--tx); font:600 14px 'Inter'; }
+  .plist { list-style:none; }
+  .plist li { display:flex; gap:12px; align-items:flex-start; padding:13px 0; border-bottom:1px solid var(--edge); font-size:14.5px; }
+  .plist li:last-child { border:0; }
+  .plist svg { width:18px; height:18px; min-width:18px; margin-top:2px; }
+
+  /* faq */
+  details { background:var(--panel); border:1px solid var(--edge); border-radius:14px; padding:20px 24px; margin-bottom:12px; }
+  summary { cursor:pointer; font-weight:600; font-size:15.5px; list-style:none; display:flex; justify-content:space-between; }
+  summary::after { content:'+'; color:var(--acc); font-weight:700; }
+  details[open] summary::after { content:'–'; }
+  details p { color:var(--mut); font-size:14.5px; margin-top:12px; }
+
+  footer { border-top:1px solid var(--edge); padding:36px 0 48px; color:var(--mut); font-size:13.5px; }
+  .foot-in { display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+
+  @media (max-width:860px) {
+    .hero-grid, .pack { grid-template-columns:1fr; }
+    .plug { transform:none; }
+    .nav-links { display:none; }
+  }
 </style>
 </head>
 <body>
-<main>
-  <h1>Workmatic Sounds</h1>
-  <p class="sub">Songs rebuilt as playable VST instruments — every note is the original audio,
-  every project is pure MIDI on the grid. Install, open the FL project, press play.</p>
 
-  <div class="grid">
-    <div class="card">
-      <h2>PULSE</h2>
-      <div class="song">pulsebreaker (Slowed) — OTVphonk × ZERTAL</div>
-      <p>4 instruments (Lead / 808 / Drums / Vox) · 2403 notes · 52 four-bar patterns · 91.15 BPM.
-      LIVE PLAY mode for even hand playing.</p>
-      <a class="btn" href="https://github.com/AutomatonAgents/workmatic-sounds/releases/download/v1.0/PULSE_pack.zip">Download pack (253 MB)</a>
+<nav>
+  <div class="wrap nav-in">
+    <a class="logo" href="#">WORK<b>MATIC</b> SOUNDS</a>
+    <div class="nav-links">
+      <a href="#listen">Listen</a>
+      <a href="#how">How it works</a>
+      <a href="#packs">Packs</a>
+      <a href="#faq">FAQ</a>
     </div>
-    <div class="card">
-      <h2>Your next song</h2>
-      <div class="song">the pipeline is repeatable</div>
-      <p>MP3 in → stems → per-occurrence chunks → compiled VSTs → FL project. New packs land here.</p>
-      <a class="btn soon" href="#">—</a>
+    <a class="nav-cta" href="#packs">Get PULSE</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="orb a"></div><div class="orb b"></div>
+  <div class="wrap hero-grid">
+    <div>
+      <div class="kicker">Songs as instruments</div>
+      <h1>The whole song,<br>under <span>your fingers</span>.</h1>
+      <p class="lede">We rebuild full tracks as playable VST instruments. Every key triggers the
+      original audio. Every project is pure MIDI, locked to the grid. Open the FL Studio
+      project, press play — it <em>is</em> the song.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="#packs">Download PULSE pack</a>
+        <a class="btn ghost" href="#listen">▶ Hear the render</a>
+      </div>
+      <div class="stats">
+        <div class="stat"><b>2403</b><span>notes, all real audio</span></div>
+        <div class="stat"><b>100%</b><span>on the grid</span></div>
+        <div class="stat"><b>4</b><span>compiled instruments</span></div>
+        <div class="stat"><b>1</b><span>click install</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="plug">
+        <div class="plug-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span style="margin-left:8px">PULSELEAD_VST — Fruity Wrapper</span></div>
+        <div class="plug-body">
+          <div class="plug-name">PULSELEAD</div>
+          <div class="plug-sub">pulsebreaker &nbsp;|&nbsp; per-occurrence engine &nbsp;|&nbsp; 91.15 BPM</div>
+          <div class="live">LIVE PLAY</div>
+          <div class="plug-foot">WORKMATIC — OWN COMPILED INSTRUMENT</div>
+        </div>
+        <div class="keys">
+          <div></div><div class="b"></div><div></div><div class="b"></div><div class="lit"></div>
+          <div class="b"></div><div></div><div class="b"></div><div></div><div class="lit b"></div>
+          <div></div><div class="b"></div><div></div><div class="b"></div><div></div>
+        </div>
+      </div>
     </div>
   </div>
+</header>
 
-  <footer>© Workmatic · packs install with one .bat — plugins + samples + FL project · contact: hello@workmatic.io</footer>
-</main>
+<section id="listen">
+  <div class="wrap">
+    <div class="sec-kicker">Listen</div>
+    <h2>This is the plugin rendering. Not the record.</h2>
+    <div class="player">
+      <button class="pbtn" id="pp" aria-label="Play demo">
+        <svg id="ic-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg id="ic-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+      </button>
+      <div class="wave" id="wave"></div>
+      <div class="ptime" id="ptime">0:00 / 0:28</div>
+    </div>
+    <p class="player-cap">28 seconds of the four PULSE instruments playing their MIDI — rendered headless, no mixing, no mastering.</p>
+    <audio id="au" src="pulse_demo.mp3" preload="metadata"></audio>
+  </div>
+</section>
+
+<section id="how" style="background:var(--panel2); border-block:1px solid var(--edge)">
+  <div class="wrap">
+    <div class="sec-kicker">How it works</div>
+    <h2>From a track to an instrument</h2>
+    <div class="grid3">
+      <div class="card"><div class="step-n">01</div>
+        <h3>Every note becomes a sample</h3>
+        <p>The song is separated into stems and cut at every note event. Each occurrence keeps its
+        exact original audio — nothing is re-synthesized.</p></div>
+      <div class="card"><div class="step-n">02</div>
+        <h3>Compiled into real VSTs</h3>
+        <p>The slices are mapped into our own compiled instruments (lead, 808, drums, vox) with
+        die-out tails and loudness-matched keys for live playing.</p></div>
+      <div class="card"><div class="step-n">03</div>
+        <h3>Pure MIDI, on the grid</h3>
+        <p>The included FL Studio project reproduces the track from 4-bar patterns whose notes sit
+        exactly on the lines — editable like any beat you'd write yourself.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="packs">
+  <div class="wrap">
+    <div class="sec-kicker">Packs</div>
+    <h2>Available now</h2>
+    <div class="pack">
+      <div>
+        <span class="tag">PACK 001</span>
+        <h3>PULSE</h3>
+        <div class="song">pulsebreaker (Slowed) — OTVphonk × ZERTAL</div>
+        <p>Four instruments carrying the full track — melody bells, gliding 808, the complete kit
+        and the vocal chops. Toggle LIVE PLAY and the whole keyboard plays evenly by hand.</p>
+        <div class="spec">
+          <div><b>4 VST instruments</b>Lead / 808 / Drums / Vox</div>
+          <div><b>2403 notes</b>every one is original audio</div>
+          <div><b>52 patterns</b>4 bars each, on the 1-2-3-4 grid</div>
+          <div><b>91.15 BPM</b>project tempo pre-set</div>
+        </div>
+        <a class="btn primary" href="https://github.com/AutomatonAgents/workmatic-sounds/releases/download/v1.0/PULSE_pack.zip">Download pack — 253 MB</a>
+      </div>
+      <div>
+        <ul class="plist">
+          <li><svg viewBox="0 0 24 24" fill="#6ea8ff"><path d="M9 16.2l-3.5-3.5L4 14.2 9 19.2 20 8.2l-1.4-1.4z"/></svg>
+            Windows VST2 instruments (64-bit), tested in FL Studio 2025</li>
+          <li><svg viewBox="0 0 24 24" fill="#6ea8ff"><path d="M9 16.2l-3.5-3.5L4 14.2 9 19.2 20 8.2l-1.4-1.4z"/></svg>
+            Open-and-play <b>&nbsp;.flp&nbsp;</b> project — no setup inside the DAW</li>
+          <li><svg viewBox="0 0 24 24" fill="#6ea8ff"><path d="M9 16.2l-3.5-3.5L4 14.2 9 19.2 20 8.2l-1.4-1.4z"/></svg>
+            One-click INSTALL.bat — plugins, samples and links placed for you</li>
+          <li><svg viewBox="0 0 24 24" fill="#6ea8ff"><path d="M9 16.2l-3.5-3.5L4 14.2 9 19.2 20 8.2l-1.4-1.4z"/></svg>
+            LIVE PLAY mode — loudness-matched keys for performing new melodies</li>
+          <li><svg viewBox="0 0 24 24" fill="#6ea8ff"><path d="M9 16.2l-3.5-3.5L4 14.2 9 19.2 20 8.2l-1.4-1.4z"/></svg>
+            Streaming engine — light on RAM, samples load from disk</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" style="background:var(--panel2); border-block:1px solid var(--edge)">
+  <div class="wrap">
+    <div class="sec-kicker">FAQ</div>
+    <h2>Questions</h2>
+    <details open>
+      <summary>What exactly is in a pack?</summary>
+      <p>Compiled VST instruments (one per stem: lead, 808, drums, vox), the per-occurrence audio
+      they stream, an FL Studio project that plays the full song from pure MIDI, and an installer
+      that sets everything up in one run.</p>
+    </details>
+    <details>
+      <summary>Which DAWs are supported?</summary>
+      <p>The instruments are 64-bit Windows VST2 plugins — they load in FL Studio, Ableton Live,
+      Reaper and most Windows hosts. The included project file is FL Studio 2025.</p>
+    </details>
+    <details>
+      <summary>Can I change the notes?</summary>
+      <p>Yes — that's the point. The project is ordinary MIDI in ordinary patterns. Move, mute and
+      rearrange freely. One rule: don't edit note <b>velocities</b> — velocity selects which original
+      audio slice plays.</p>
+    </details>
+    <details>
+      <summary>How do I install?</summary>
+      <p>Unzip, run INSTALL.bat (as administrator, or pass your own VST folder), rescan plugins in
+      your DAW, open the included .flp, press play.</p>
+    </details>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-in">
+    <div><b style="color:var(--tx)">WORKMATIC</b> — songs as playable instruments.</div>
+    <div>hello@workmatic.io</div>
+  </div>
+</footer>
+
+<script>
+  const au = document.getElementById('au'), pp = document.getElementById('pp'),
+        icP = document.getElementById('ic-play'), icZ = document.getElementById('ic-pause'),
+        wave = document.getElementById('wave'), pt = document.getElementById('ptime');
+  const N = 64, bars = [];
+  let seed = 7;
+  for (let i = 0; i < N; i++) {
+    seed = (seed * 16807) % 2147483647;
+    const b = document.createElement('i');
+    b.style.height = (18 + (seed % 70)) + '%';
+    wave.appendChild(b); bars.push(b);
+  }
+  const fmt = s => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
+  pp.onclick = () => au.paused ? au.play() : au.pause();
+  au.onplay = () => { icP.style.display = 'none'; icZ.style.display = ''; };
+  au.onpause = () => { icP.style.display = ''; icZ.style.display = 'none'; };
+  au.ontimeupdate = () => {
+    const d = au.duration || 28, k = Math.floor(au.currentTime / d * N);
+    bars.forEach((b, i) => b.classList.toggle('on', i <= k));
+    pt.textContent = fmt(au.currentTime) + ' / ' + fmt(d);
+  };
+  wave.onclick = e => {
+    const r = wave.getBoundingClientRect();
+    au.currentTime = (e.clientX - r.left) / r.width * (au.duration || 28);
+  };
+</script>
 </body>
 </html>
