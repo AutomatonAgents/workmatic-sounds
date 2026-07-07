@@ -91,6 +91,12 @@
   .ptime { font:600 13px var(--mono); color:var(--mut); min-width:88px; text-align:right; }
   .player-cap { font-size:13px; color:var(--mut); margin-top:12px; }
 
+  .grid3 { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px; }
+  .card { background:var(--panel); border:1px solid var(--edge); padding:24px; }
+  .step-n { font:700 12px var(--mono); color:var(--acc); }
+  .card h3 { font:700 17px var(--disp); margin:10px 0 8px; text-transform:uppercase; }
+  .card p { color:var(--mut); font-size:14.5px; }
+
   .pack { display:grid; grid-template-columns:1.1fr .9fr; gap:36px; background:var(--panel);
           border:1px solid var(--edge); padding:36px; align-items:center; }
   .pack + .pack { margin-top:22px; }
@@ -131,6 +137,7 @@
     <a class="logo" href="#">VOID<b>KEYS</b></a>
     <div class="nav-links">
       <a href="#listen">Listen</a>
+      <a href="#how">How it works</a>
       <a href="#packs">Packs</a>
       <a href="#faq">FAQ</a>
     </div>
@@ -183,6 +190,27 @@
     <div class="player-label">DARING — demo</div>
     <div class="player" data-src="dare_demo.mp3"></div>
     <p class="player-cap">28 seconds each — no mixing, no mastering.</p>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="sec-kicker">How it works</div>
+    <h2>Our own engine</h2>
+    <div class="grid3">
+      <div class="card"><div class="step-n">01</div>
+        <h3>Voiced in-house</h3>
+        <p>Every instrument is designed and voiced on our own engine — each key is tuned,
+        loudness-matched and ready to perform.</p></div>
+      <div class="card"><div class="step-n">02</div>
+        <h3>Compiled as real plugins</h3>
+        <p>The sounds ship as self-contained VST instruments — no external sample libraries,
+        no third-party players, nothing else to buy.</p></div>
+      <div class="card"><div class="step-n">03</div>
+        <h3>Ready to play</h3>
+        <p>Each pack includes a ready-made FL Studio project and a one-run installer. Open,
+        press play, make it yours.</p></div>
+    </div>
   </div>
 </section>
 
