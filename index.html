@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Workmatic Sounds — songs as playable instruments</title>
+<style>
+  :root { --bg:#0f1014; --card:#1a1c24; --edge:#2c3040; --tx:#f0f0f5; --mut:#7f87a0; --acc:#6ea8ff; }
+  * { box-sizing:border-box; margin:0; }
+  body { background:var(--bg); color:var(--tx); font:16px/1.6 system-ui,Segoe UI,Arial,sans-serif; }
+  main { max-width:960px; margin:0 auto; padding:48px 20px; }
+  h1 { font-size:34px; letter-spacing:.5px; }
+  .sub { color:var(--mut); margin:8px 0 40px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
+  .card { background:var(--card); border:1px solid var(--edge); border-radius:12px; padding:22px; }
+  .card h2 { font-size:20px; }
+  .card .song { color:var(--acc); font-size:14px; margin:2px 0 12px; }
+  .card p { color:var(--mut); font-size:14px; margin-bottom:16px; }
+  .btn { display:inline-block; background:var(--acc); color:#0b0c10; font-weight:600;
+         padding:10px 18px; border-radius:8px; text-decoration:none; }
+  .btn.soon { background:var(--edge); color:var(--mut); pointer-events:none; }
+  footer { color:var(--mut); font-size:13px; margin-top:56px; border-top:1px solid var(--edge); padding-top:20px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Workmatic Sounds</h1>
+  <p class="sub">Songs rebuilt as playable VST instruments — every note is the original audio,
+  every project is pure MIDI on the grid. Install, open the FL project, press play.</p>
+
+  <div class="grid">
+    <div class="card">
+      <h2>PULSE</h2>
+      <div class="song">pulsebreaker (Slowed) — OTVphonk × ZERTAL</div>
+      <p>4 instruments (Lead / 808 / Drums / Vox) · 2403 notes · 52 four-bar patterns · 91.15 BPM.
+      LIVE PLAY mode for even hand playing.</p>
+      <!-- host the zip on a GitHub Release and paste its URL here -->
+      <a class="btn soon" href="#">Download pack — coming soon</a>
+    </div>
+    <div class="card">
+      <h2>Your next song</h2>
+      <div class="song">the pipeline is repeatable</div>
+      <p>MP3 in → stems → per-occurrence chunks → compiled VSTs → FL project. New packs land here.</p>
+      <a class="btn soon" href="#">—</a>
+    </div>
+  </div>
+
+  <footer>© Workmatic · packs install with one .bat — plugins + samples + FL project · contact: hello@workmatic.io</footer>
+</main>
+</body>
+</html>
